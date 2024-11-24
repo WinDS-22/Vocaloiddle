@@ -209,6 +209,6 @@ def leaderboard():
     return render_template("leaderboard.html", scores=scores)
 
 if __name__ == "__main__":
+    add_ip_to_mongodb_atlas()
     port = int(os.environ.get("PORT", 5000))  # Render asigna el puerto automáticamente
     app.run(host="0.0.0.0", port=port)
-    add_ip_to_mongodb_atlas()

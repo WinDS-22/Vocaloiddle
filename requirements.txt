@@ -2,3 +2,4 @@ Flask>=2.3.3
 Flask-Session>=0.4.0
 pymongo>=4.5.0
 Werkzeug>=2.3.7
+requests>= 2.0.0

@@ -19,7 +19,7 @@ Session(app)
 
 # Conexión a MongoDB
 MONGO_URI = "mongodb+srv://windscraft22:QQIv872Rw6QfIMsq@cluster0.g6a8d.mongodb.net/?retryWrites=true&w=majority"
-client = MongoClient(MONGO_URI)
+client = MongoClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)
 db = client["vocaloid_game"]
 songs_collection = db["songs"]
 daily_collection = db["daily_song"]

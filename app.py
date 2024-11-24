@@ -31,11 +31,8 @@ users_collection = db["users"]
 def add_ip_to_mongodb_atlas():
     # Credenciales de la API de MongoDB Atlas
     public_key = os.getenv("MONGODB_ATLAS_PUBLIC_KEY")
-    print(public_key)
     private_key = os.getenv("MONGODB_ATLAS_PRIVATE_KEY")
-    print(private_key)
     project_id = os.getenv("MONGODB_ATLAS_PROJECT_ID")  # ID del proyecto en MongoDB Atlas
-    print(project_id)
 
     # Obtén la IP pública del servidor
     try:
@@ -64,7 +61,7 @@ def add_ip_to_mongodb_atlas():
         response = requests.post(
             atlas_api_url,
             auth=HTTPDigestAuth(public_key, private_key),
-            json=payload,
+            json=[payload],
             headers=headers
         )
         response.raise_for_status()

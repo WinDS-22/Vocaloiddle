@@ -9,8 +9,6 @@ import requests
 from requests.auth import HTTPDigestAuth
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
-
 
 app = Flask(__name__)
 
@@ -45,7 +43,7 @@ def add_ip_to_mongodb_atlas():
         return
 
     # URL de la API de MongoDB Atlas
-    atlas_api_url = f"https://cloud.mongodb.com/api/atlas/v1.0/groups/{project_id}/accessList"
+    atlas_api_url = f"https://cloud.mongodb.com/api/atlas/v1.0/groups/67428001a871207f7633112e/accessList"
 
     # Configuración de la IP a agregar
     payload = {

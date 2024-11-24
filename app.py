@@ -17,6 +17,8 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+logging.basicConfig(level=logging.INFO)
+
 # Conexión a MongoDB
 MONGO_URI = "mongodb+srv://windscraft22:QQIv872Rw6QfIMsq@cluster0.g6a8d.mongodb.net/?retryWrites=true&w=majority"
 client = MongoClient(MONGO_URI, tls=True, tlsAllowInvalidCertificates=True)

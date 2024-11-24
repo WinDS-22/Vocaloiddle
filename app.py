@@ -5,6 +5,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import random
 import os
+import requests
+from requests.auth import HTTPDigestAuth
+
+logging.basicConfig(level=logging.DEBUG)
+
 
 app = Flask(__name__)
 
@@ -21,6 +26,43 @@ songs_collection = db["songs"]
 daily_collection = db["daily_song"]
 scores_collection = db["scores"]
 users_collection = db["users"]
+
+def add_ip_to_mongodb_atlas():
+    # Credenciales de la API de MongoDB Atlas
+    public_key = os.getenv("MONGODB_ATLAS_PUBLIC_KEY")
+    private_key = os.getenv("MONGODB_ATLAS_PRIVATE_KEY")
+    project_id = os.getenv("MONGODB_ATLAS_PROJECT_ID")  # ID del proyecto en MongoDB Atlas
+
+    # Obtén la IP pública del servidor
+    try:
+        response = requests.get("https://api64.ipify.org?format=json")
+        response.raise_for_status()
+        public_ip = response.json()["ip"]
+        print(f"Detected public IP: {public_ip}")
+    except Exception as e:
+        print(f"Failed to fetch public IP: {e}")
+        return
+
+    # URL de la API de MongoDB Atlas
+    atlas_api_url = f"https://cloud.mongodb.com/api/atlas/v1.0/groups/{project_id}/accessList"
+
+    # Configuración de la IP a agregar
+    payload = {
+        "ipAddress": public_ip,
+        "comment": "Added by Render deployment script"
+    }
+
+    # Agregar la IP usando la API
+    try:
+        response = requests.post(
+            atlas_api_url,
+            auth=HTTPDigestAuth(public_key, private_key),
+            json=payload
+        )
+        response.raise_for_status()
+        print("IP added successfully to MongoDB Atlas!")
+    except Exception as e:
+        print(f"Failed to add IP to MongoDB Atlas: {e}")
 
 # Fetch all songs from MongoDB
 def fetch_all_songs():
@@ -170,3 +212,4 @@ def leaderboard():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))  # Render asigna el puerto automáticamente
     app.run(host="0.0.0.0", port=port)
+    add_ip_to_mongodb_atlas()

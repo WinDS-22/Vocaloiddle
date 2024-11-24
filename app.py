@@ -1,10 +1,10 @@
-
 from flask import Flask, render_template, request, redirect, session, jsonify
 from pymongo import MongoClient
 from flask_session import Session
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import random
+import os
 
 app = Flask(__name__)
 

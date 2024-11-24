@@ -14,7 +14,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Conexión a MongoDB
-MONGO_URI = "mongodb+srv://<username>:<password>@cluster0.mongodb.net/?retryWrites=true&w=majority"
+MONGO_URI = "mongodb+srv://windscraft22:QQIv872Rw6QfIMsq@cluster0.g6a8d.mongodb.net/?retryWrites=true&w=majority"
 client = MongoClient(MONGO_URI)
 db = client["vocaloid_game"]
 songs_collection = db["songs"]

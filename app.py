@@ -60,10 +60,12 @@ def add_ip_to_mongodb_atlas():
     
     # Agregar la IP usando la API
     try:
+        headers = {"Content-Type": "application/json"}
         response = requests.post(
             atlas_api_url,
             auth=HTTPDigestAuth(public_key, private_key),
             json=payload,
+            headers=headers
         )
         response.raise_for_status()
         print("IP added successfully to MongoDB Atlas!")

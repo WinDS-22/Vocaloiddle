@@ -67,6 +67,7 @@ def add_ip_to_mongodb_atlas():
         print("IP added successfully to MongoDB Atlas!")
     except Exception as e:
         print(f"Failed to add IP to MongoDB Atlas: {e}")
+        print(f"Error response: {response.text}")
 
 # Fetch all songs from MongoDB
 def fetch_all_songs():

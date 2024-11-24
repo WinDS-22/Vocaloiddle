@@ -7,6 +7,7 @@ import random
 import os
 import requests
 from requests.auth import HTTPDigestAuth
+import logging
 
 logging.basicConfig(level=logging.DEBUG)
 

@@ -1,0 +1,51 @@
+<body>
+    <h1>Adivina la canción</h1>
+    <div>
+        <img id="thumb" src="" alt="Pista Visual" style="max-width: 300px; display: none;">
+    </div>
+    <button onclick="playSnippet()">Reproducir fragmento</button>
+    <input id="username" type="text" placeholder="Tu nombre">
+    <input id="guess" type="text" placeholder="Tu respuesta">
+    <button onclick="submitGuess()">Enviar</button>
+</body>
+<script>
+    let songData = {};
+    let gameMode = "daily";  // Cambiar a "unlimited" si es necesario
+
+    function playSnippet() {
+        const audio = new Audio(songData.snippetUrl);
+        audio.play();
+    }
+
+    function submitGuess() {
+        const username = document.getElementById("username").value;
+        const guess = document.getElementById("guess").value;
+
+        fetch("/guess", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                username: username,
+                answer: guess,
+                mode: gameMode,
+                ...songData
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.correct) alert("¡Correcto!");
+            else alert("Incorrecto, intenta de nuevo.");
+        });
+    }
+
+    // Obtener datos del juego
+    fetch(window.location.href)
+        .then(res => res.json())
+        .then(data => {
+            songData = data;
+            if (data.thumbUrl) {
+                document.getElementById("thumb").src = data.thumbUrl;
+                document.getElementById("thumb").style.display = "block";
+            }
+        });
+</script>

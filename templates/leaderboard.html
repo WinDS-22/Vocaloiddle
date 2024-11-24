@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabla de Clasificación</title>
+</head>
+<body>
+    <h1>Tabla de Clasificación</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Racha Diario</th>
+                <th>Máximo en Modo Sin Límite</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for score in scores %}
+            <tr>
+                <td>{{ score.username }}</td>
+                <td>{{ score.daily_streak }}</td>
+                <td>{{ score.max_unlimited_streak }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,4 +1,5 @@
 <body>
+    <input type="hidden" id="gameMode" value="{{ mode }}">
     <h1>Adivina la canción</h1>
     <div>
         <img id="thumb" src="" alt="Pista Visual" style="max-width: 300px; display: none;">
@@ -12,4 +13,3 @@
 <!-- Vinculamos el CSS externo -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
 <script src="{{ url_for('static', filename='js/game.js') }}"></script>
-<input type="hidden" id="gameMode" value="{{ mode }}">

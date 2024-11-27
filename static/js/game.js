@@ -5,7 +5,12 @@ let attemptsLeft = 6;
 // Obtener los datos de la canción usando el modo de juego
 function fetchSongData() {
     fetch(`/api/song/${gameMode}`)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error("Error en la respuesta del servidor: " + res.status);
+            }
+            return res.json();
+        })
         .then(data => {
             songData = data;
             if (data.thumbUrl) {
@@ -13,8 +18,12 @@ function fetchSongData() {
                 document.getElementById("thumb").style.display = "block";
             }
         })
-        .catch(error => console.error('Error al obtener los datos de la canción:', error));
+        .catch(error => {
+            console.error('Error al obtener los datos de la canción:', error);
+            alert("No se pudo cargar la canción. Inténtalo de nuevo más tarde.");
+        });
 }
+
 
 // Reproducir fragmento usando el primer enlace de "links"
 function playSnippet() {

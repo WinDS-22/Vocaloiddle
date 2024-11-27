@@ -1,9 +1,8 @@
 let songData = {};
-let gameMode = "{{ mode }}";
-let selectedSongId = null;  // Guardamos el id de la canción seleccionada
+let gameMode = document.getElementById("gameMode").value;  // Obtener el valor del modo desde el HTML
 let attemptsLeft = 6;
 
-// Obtener los datos de la canción
+// Obtener los datos de la canción usando el modo de juego
 function fetchSongData() {
     fetch(`/api/song/${gameMode}`)
         .then(res => res.json())
@@ -13,65 +12,31 @@ function fetchSongData() {
                 document.getElementById("thumb").src = data.thumbUrl;
                 document.getElementById("thumb").style.display = "block";
             }
-        });
+        })
+        .catch(error => console.error('Error al obtener los datos de la canción:', error));
 }
 
+// Reproducir fragmento usando el primer enlace de "links"
 function playSnippet() {
     if (songData.snippetUrl) {
-        const audio = new Audio(songData.snippetUrl);
-        const snippetDurations = [1, 2, 3, 4, 5, 6];
+        const audio = new Audio(songData.snippetUrl);  // Usamos el snippetUrl proporcionado por el servidor
+        const snippetDurations = [1, 2, 3, 4, 5, 6];  // Duraciones de fragmentos crecientes según los intentos restantes
         audio.currentTime = 0;
-        audio.play();
-        setTimeout(() => audio.pause(), snippetDurations[6 - attemptsLeft] * 1000);
+        audio.play().catch(error => console.error("Error al reproducir el fragmento:", error));
+        setTimeout(() => audio.pause(), snippetDurations[6 - attemptsLeft] * 1000);  // Ajustamos la duración según los intentos
     } else {
         alert("No se encontró un fragmento para esta canción.");
     }
 }
 
-// Autocompletar con canción + artista y seleccionar por id
-function autocompleteGuess() {
-    const query = document.getElementById("guess").value;
-    if (query.length > 1) {
-        fetch(`/autocomplete?q=${query}`)
-            .then(res => res.json())
-            .then(songs => {
-                const autocompleteContainer = document.getElementById("autocomplete-container");
-                autocompleteContainer.innerHTML = "";  // Limpiar resultados anteriores
-                songs.forEach(song => {
-                    const suggestionDiv = document.createElement("div");
-                    suggestionDiv.textContent = `${song.name} - ${song.artist}`;  // Mostrar nombre y artista
-                    suggestionDiv.onclick = () => {
-                        document.getElementById("guess").value = `${song.name} - ${song.artist}`;
-                        selectedSongId = song.id;  // Guardamos el id de la canción seleccionada
-                        autocompleteContainer.innerHTML = "";  // Limpiar después de seleccionar
-                    };
-                    autocompleteContainer.appendChild(suggestionDiv);
-                });
-
-                // Posicionar el contenedor debajo del input
-                const input = document.getElementById("guess");
-                const rect = input.getBoundingClientRect();
-                autocompleteContainer.style.left = `${rect.left}px`;
-                autocompleteContainer.style.top = `${rect.bottom + window.scrollY}px`;
-                autocompleteContainer.style.width = `${rect.width}px`;
-            });
-    } else {
-        document.getElementById("autocomplete-container").innerHTML = "";  // Limpiar si no hay query
-    }
-}
-
-// Enviar el guess basado en el id
 function submitGuess() {
-    if (!selectedSongId) {
-        alert("Selecciona una canción antes de enviar.");
-        return;
-    }
+    const guess = document.getElementById("guess").value;
 
     fetch("/guess", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            answerId: selectedSongId,  // Enviar el id en lugar del nombre
+            answer: guess,
             mode: gameMode,
             ...songData
         })
@@ -88,7 +53,8 @@ function submitGuess() {
                 alert("No te quedan más intentos.");
             }
         }
-    });
+    })
+    .catch(error => console.error('Error al enviar la respuesta:', error));
 }
 
-fetchSongData();
+fetchSongData();  // Llamamos para obtener los datos de la canción al cargar la página

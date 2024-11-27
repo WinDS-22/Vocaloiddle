@@ -12,3 +12,22 @@
 <!-- Vinculamos el CSS externo -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
 <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+<script>
+    let songData = {};
+    let gameMode = "{{ mode }}";  // Flask ahora pasa el modo correctamente
+
+    // Obtener datos de la canción usando el modo de juego
+    function fetchSongData() {
+        fetch(`/api/song/${gameMode}`)  // Aquí usamos gameMode con el valor correcto
+            .then(res => res.json())
+            .then(data => {
+                songData = data;
+                if (data.thumbUrl) {
+                    document.getElementById("thumb").src = data.thumbUrl;
+                    document.getElementById("thumb").style.display = "block";
+                }
+            });
+    }
+
+    fetchSongData();
+</script>

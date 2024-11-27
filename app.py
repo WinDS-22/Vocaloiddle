@@ -216,17 +216,31 @@ def leaderboard():
 
 @app.route("/api/song/<mode>")
 def get_song_data(mode):
-    if mode == "daily":
-        song = daily_mode()  # Obtener la canción diaria
-    else:
-        all_songs = fetch_all_songs()  # Obtener una canción aleatoria
-        song = random.choice(all_songs)
+    try:
+        if mode == "daily":
+            song = daily_mode()  # Obtener la canción diaria
+        else:
+            all_songs = fetch_all_songs()  # Obtener una canción aleatoria
+            song = random.choice(all_songs)
 
-    print(song)
-    
-    # Seleccionamos el primer enlace de la lista de links como el fragmento a reproducir
-    snippet_url = song.get("links", [None])[0]  # Tomamos el primer link de la lista, si existe
-    print(snippet_url)
+        # Seleccionamos el primer enlace de la lista de links como el fragmento a reproducir
+        snippet_url = song.get("links", [None])[0]  # Tomamos el primer link de la lista, si existe
+
+        if not snippet_url:
+            raise ValueError("No se encontró un enlace de reproducción para esta canción")
+
+        return jsonify({
+            "_id": str(song["_id"]),  # Convertimos el ObjectId a string
+            "title": song["defaultName"],
+            "artist": song["Artist"],
+            "name": song["name"],
+            "links": song["links"],  # Devolvemos los enlaces completos por si quieres usarlos en otro lugar
+            "snippetUrl": snippet_url,  # Enviamos el primer enlace como fragmento
+            "thumbUrl": song.get("thumbUrl", "")
+        })
+    except Exception as e:
+        app.logger.error(f"Error al obtener los datos de la canción: {e}")
+        return jsonify({"error": "No se pudo obtener la canción. Inténtalo de nuevo más tarde."}), 500
 
     return jsonify({
         "_id": str(song["_id"]),  # Convertimos el ObjectId a string

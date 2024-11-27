@@ -1,0 +1,36 @@
+/* Aumentar el tamaño del input y el dropdown */
+#guess {
+    width: 400px;
+    height: 40px;
+    font-size: 18px;
+    padding: 10px;
+}
+
+.autocomplete-dropdown {
+    position: absolute;
+    border: 1px solid #ddd;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+    z-index: 1000;
+    width: 400px;  /* Igualar al input */
+    font-size: 18px;
+}
+
+.autocomplete-dropdown div {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+
+.autocomplete-dropdown div:hover {
+    background-color: #f0f0f0;
+}
+
+/* Ajustamos el botón */
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+}

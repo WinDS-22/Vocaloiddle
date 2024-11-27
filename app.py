@@ -182,7 +182,7 @@ def start_game(mode):
     if not username:
         return redirect("/login")
 
-    # Renderiza la página del juego en lugar de devolver directamente los datos de la canción
+    # Renderiza la página del juego, pasando el modo como contexto
     return render_template("game.html", mode=mode)
 
 @app.route("/guess", methods=["POST"])

@@ -222,8 +222,11 @@ def get_song_data(mode):
         all_songs = fetch_all_songs()  # Obtener una canción aleatoria
         song = random.choice(all_songs)
 
+    print(song)
+    
     # Seleccionamos el primer enlace de la lista de links como el fragmento a reproducir
     snippet_url = song.get("links", [None])[0]  # Tomamos el primer link de la lista, si existe
+    print(snippet_url)
 
     return jsonify({
         "_id": str(song["_id"]),  # Convertimos el ObjectId a string

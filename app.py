@@ -190,15 +190,21 @@ def guess():
     username = session.get("username")
     if not username:
         return {"error": "Usuario no autenticado"}
-    answer = data.get("answer", "").lower()
+
+    song_id = data.get("answerId")
     mode = data.get("mode")
-    correct = data.get("title", "").lower() in answer or any(
-        artist.lower() in answer for artist in data.get("artist", "").split(", ")
-    )
+
+    # Verificar si la canción seleccionada es correcta
+    if song_id == songData["_id"]:  # Verificamos por id
+        correct = True
+    else:
+        correct = False
+
     if mode == "daily":
         update_daily_streak(username, correct)
     elif mode == "unlimited":
         update_unlimited_streak(username, correct)
+
     return jsonify({"correct": correct})
 
 @app.route("/leaderboard")
@@ -216,12 +222,12 @@ def get_song_data(mode):
         song = random.choice(all_songs)
 
     return jsonify({
+        "_id": str(song["_id"]),  # Convertimos el ObjectId a string
         "title": song["defaultName"],
         "artist": song["Artist"],
         "name": song["name"],
         "links": song["links"],
-        # Puedes agregar una URL de snippet y una imagen aquí si es necesario
-        "snippetUrl": song.get("snippetUrl", ""),
+        "snippetUrl": song.get("snippetUrl", ""),  # Aquí es donde necesitas verificar que existan los URLs
         "thumbUrl": song.get("thumbUrl", "")
     })
 
@@ -229,11 +235,13 @@ def get_song_data(mode):
 def autocomplete():
     query = request.args.get("q", "").lower()
     if query:
-        matching_songs = songs_collection.find({"name": {"$regex": query, "$options": "i"}}, {"_id": 0, "name": 1})
-        results = [song["name"] for song in matching_songs]
+        matching_songs = songs_collection.find(
+            {"name": {"$regex": query, "$options": "i"}},
+            {"_id": 1, "name": 1, "Artist": 1}
+        )
+        results = [{"id": str(song["_id"]), "name": song["name"], "artist": song["Artist"]} for song in matching_songs]
         return jsonify(results)
     return jsonify([])
-
 
 if __name__ == "__main__":
     add_ip_to_mongodb_atlas()

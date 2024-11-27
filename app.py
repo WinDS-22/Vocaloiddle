@@ -207,6 +207,25 @@ def leaderboard():
     scores.sort(key=lambda x: x.get("max_unlimited_streak", 0), reverse=True)
     return render_template("leaderboard.html", scores=scores)
 
+@app.route("/api/song/<mode>")
+def get_song_data(mode):
+    if mode == "daily":
+        song = daily_mode()  # Obtener la canción diaria
+    else:
+        all_songs = fetch_all_songs()  # Obtener una canción aleatoria
+        song = random.choice(all_songs)
+
+    return jsonify({
+        "title": song["defaultName"],
+        "artist": song["Artist"],
+        "name": song["name"],
+        "links": song["links"],
+        # Puedes agregar una URL de snippet y una imagen aquí si es necesario
+        "snippetUrl": song.get("snippetUrl", ""),
+        "thumbUrl": song.get("thumbUrl", "")
+    })
+
+
 if __name__ == "__main__":
     add_ip_to_mongodb_atlas()
     port = int(os.environ.get("PORT", 5000))  # Render asigna el puerto automáticamente

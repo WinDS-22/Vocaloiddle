@@ -4,18 +4,18 @@
         <img id="thumb" src="" alt="Pista Visual" style="max-width: 300px; display: none;">
     </div>
     <button onclick="playSnippet()">Reproducir fragmento</button>
-    <input id="username" type="text" placeholder="Tu nombre">
-    <input id="guess" type="text" placeholder="Tu respuesta">
+    <input id="guess" type="text" placeholder="Tu respuesta" oninput="autocompleteGuess()">
+    <ul id="autocomplete-results"></ul>
     <button onclick="submitGuess()">Enviar</button>
 </body>
 
 <script>
     let songData = {};
-    let gameMode = "{{ mode }}";  // Obtener el modo de juego desde Flask
+    let gameMode = "{{ mode }}";
+    let attemptsLeft = 6;
 
-    // Obtener datos de la canción
     function fetchSongData() {
-        fetch(`/api/song/${gameMode}`)  // Cambié la URL a una ruta dedicada
+        fetch(`/api/song/${gameMode}`)
             .then(res => res.json())
             .then(data => {
                 songData = data;
@@ -28,18 +28,27 @@
 
     function playSnippet() {
         const audio = new Audio(songData.snippetUrl);
+        if (songData.snippetUrl) {
+            audio.play().catch(error => {
+                console.error("Error al reproducir el fragmento: ", error);
+            });
+        } else {
+            alert("No se encontró un fragmento para esta canción.");
+        }
+        //const audio = new Audio(songData.snippetUrl);
+        const snippetDurations = [1, 2, 3, 4, 5, 6];
+        audio.currentTime = 0;
         audio.play();
+        setTimeout(() => audio.pause(), snippetDurations[6 - attemptsLeft] * 1000);
     }
 
     function submitGuess() {
-        const username = document.getElementById("username").value;
         const guess = document.getElementById("guess").value;
 
         fetch("/guess", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                username: username,
                 answer: guess,
                 mode: gameMode,
                 ...songData
@@ -47,11 +56,39 @@
         })
         .then(res => res.json())
         .then(data => {
-            if (data.correct) alert("¡Correcto!");
-            else alert("Incorrecto, intenta de nuevo.");
+            if (data.correct) {
+                alert("¡Correcto!");
+            } else {
+                attemptsLeft--;
+                if (attemptsLeft > 0) {
+                    alert(`Incorrecto, te quedan ${attemptsLeft} intentos.`);
+                } else {
+                    alert("No te quedan más intentos.");
+                }
+            }
         });
     }
 
-    // Llama a la función para obtener los datos al cargar la página
+    function autocompleteGuess() {
+        const query = document.getElementById("guess").value;
+        if (query.length > 1) {
+            fetch(`/autocomplete?q=${query}`)
+                .then(res => res.json())
+                .then(songs => {
+                    const autocompleteResults = document.getElementById("autocomplete-results");
+                    autocompleteResults.innerHTML = "";
+                    songs.forEach(song => {
+                        const li = document.createElement("li");
+                        li.textContent = song;
+                        li.onclick = () => {
+                            document.getElementById("guess").value = song;
+                            autocompleteResults.innerHTML = "";
+                        };
+                        autocompleteResults.appendChild(li);
+                    });
+                });
+        }
+    }
+
     fetchSongData();
 </script>

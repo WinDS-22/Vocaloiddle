@@ -4,10 +4,31 @@
         <img id="thumb" src="" alt="Pista Visual" style="max-width: 300px; display: none;">
     </div>
     <button onclick="playSnippet()">Reproducir fragmento</button>
-    <input id="guess" type="text" placeholder="Tu respuesta" oninput="autocompleteGuess()">
-    <ul id="autocomplete-results"></ul>
+    <input id="guess" type="text" placeholder="Tu respuesta" oninput="autocompleteGuess()" autocomplete="off">
+    <div id="autocomplete-container" class="autocomplete-dropdown"></div>
     <button onclick="submitGuess()">Enviar</button>
 </body>
+
+<style>
+    .autocomplete-dropdown {
+        position: absolute;
+        border: 1px solid #ddd;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: white;
+        z-index: 1000;
+        width: 200px; /* Ajusta según el tamaño de tu input */
+    }
+
+    .autocomplete-dropdown div {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .autocomplete-dropdown div:hover {
+        background-color: #f0f0f0;
+    }
+</style>
 
 <script>
     let songData = {};
@@ -27,19 +48,15 @@
     }
 
     function playSnippet() {
-        const audio = new Audio(songData.snippetUrl);
         if (songData.snippetUrl) {
-            audio.play().catch(error => {
-                console.error("Error al reproducir el fragmento: ", error);
-            });
+            const audio = new Audio(songData.snippetUrl);
+            const snippetDurations = [1, 2, 3, 4, 5, 6];  // Duración del fragmento según los intentos
+            audio.currentTime = 0;
+            audio.play();
+            setTimeout(() => audio.pause(), snippetDurations[6 - attemptsLeft] * 1000);
         } else {
             alert("No se encontró un fragmento para esta canción.");
         }
-        //const audio = new Audio(songData.snippetUrl);
-        const snippetDurations = [1, 2, 3, 4, 5, 6];
-        audio.currentTime = 0;
-        audio.play();
-        setTimeout(() => audio.pause(), snippetDurations[6 - attemptsLeft] * 1000);
     }
 
     function submitGuess() {
@@ -69,24 +86,34 @@
         });
     }
 
+    // Función para autocompletar
     function autocompleteGuess() {
         const query = document.getElementById("guess").value;
         if (query.length > 1) {
             fetch(`/autocomplete?q=${query}`)
                 .then(res => res.json())
                 .then(songs => {
-                    const autocompleteResults = document.getElementById("autocomplete-results");
-                    autocompleteResults.innerHTML = "";
+                    const autocompleteContainer = document.getElementById("autocomplete-container");
+                    autocompleteContainer.innerHTML = "";  // Limpiar resultados anteriores
                     songs.forEach(song => {
-                        const li = document.createElement("li");
-                        li.textContent = song;
-                        li.onclick = () => {
+                        const suggestionDiv = document.createElement("div");
+                        suggestionDiv.textContent = song;
+                        suggestionDiv.onclick = () => {
                             document.getElementById("guess").value = song;
-                            autocompleteResults.innerHTML = "";
+                            autocompleteContainer.innerHTML = "";  // Limpiar después de seleccionar
                         };
-                        autocompleteResults.appendChild(li);
+                        autocompleteContainer.appendChild(suggestionDiv);
                     });
+
+                    // Posicionar el contenedor debajo del input
+                    const input = document.getElementById("guess");
+                    const rect = input.getBoundingClientRect();
+                    autocompleteContainer.style.left = `${rect.left}px`;
+                    autocompleteContainer.style.top = `${rect.bottom + window.scrollY}px`;
+                    autocompleteContainer.style.width = `${rect.width}px`;
                 });
+        } else {
+            document.getElementById("autocomplete-container").innerHTML = "";  // Limpiar si no hay query
         }
     }
 

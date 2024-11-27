@@ -225,6 +225,15 @@ def get_song_data(mode):
         "thumbUrl": song.get("thumbUrl", "")
     })
 
+@app.route("/autocomplete", methods=["GET"])
+def autocomplete():
+    query = request.args.get("q", "").lower()
+    if query:
+        matching_songs = songs_collection.find({"name": {"$regex": query, "$options": "i"}}, {"_id": 0, "name": 1})
+        results = [song["name"] for song in matching_songs]
+        return jsonify(results)
+    return jsonify([])
+
 
 if __name__ == "__main__":
     add_ip_to_mongodb_atlas()

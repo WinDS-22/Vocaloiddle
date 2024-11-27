@@ -8,9 +8,23 @@
     <input id="guess" type="text" placeholder="Tu respuesta">
     <button onclick="submitGuess()">Enviar</button>
 </body>
+
 <script>
     let songData = {};
-    let gameMode = "daily";  // Cambiar a "unlimited" si es necesario
+    let gameMode = "{{ mode }}";  // Obtener el modo de juego desde Flask
+
+    // Obtener datos de la canción
+    function fetchSongData() {
+        fetch(`/api/song/${gameMode}`)  // Cambié la URL a una ruta dedicada
+            .then(res => res.json())
+            .then(data => {
+                songData = data;
+                if (data.thumbUrl) {
+                    document.getElementById("thumb").src = data.thumbUrl;
+                    document.getElementById("thumb").style.display = "block";
+                }
+            });
+    }
 
     function playSnippet() {
         const audio = new Audio(songData.snippetUrl);
@@ -38,14 +52,6 @@
         });
     }
 
-    // Obtener datos del juego
-    fetch(window.location.href)
-        .then(res => res.json())
-        .then(data => {
-            songData = data;
-            if (data.thumbUrl) {
-                document.getElementById("thumb").src = data.thumbUrl;
-                document.getElementById("thumb").style.display = "block";
-            }
-        });
+    // Llama a la función para obtener los datos al cargar la página
+    fetchSongData();
 </script>

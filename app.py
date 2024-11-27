@@ -222,13 +222,16 @@ def get_song_data(mode):
         all_songs = fetch_all_songs()  # Obtener una canción aleatoria
         song = random.choice(all_songs)
 
+    # Seleccionamos el primer enlace de la lista de links como el fragmento a reproducir
+    snippet_url = song.get("links", [None])[0]  # Tomamos el primer link de la lista, si existe
+
     return jsonify({
-        "_id": str(song["_id"]),  # Asegúrate de que el _id esté presente
+        "_id": str(song["_id"]),  # Convertimos el ObjectId a string
         "title": song["defaultName"],
         "artist": song["Artist"],
         "name": song["name"],
-        "links": song["links"],
-        "snippetUrl": song.get("snippetUrl", ""),
+        "links": song["links"],  # Devolvemos los enlaces completos por si quieres usarlos en otro lugar
+        "snippetUrl": snippet_url,  # Enviamos el primer enlace como fragmento
         "thumbUrl": song.get("thumbUrl", "")
     })
 

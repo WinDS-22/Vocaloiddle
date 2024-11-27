@@ -180,17 +180,9 @@ def start_game(mode):
     username = session.get("username")
     if not username:
         return redirect("/login")
-    if mode == "daily":
-        song = daily_mode()
-    else:
-        all_songs = fetch_all_songs()
-        song = random.choice(all_songs)
-    return jsonify({
-        "title": song["defaultName"],
-        "artist": song["Artist"],
-        "name": song["name"],
-        "links": song["links"]
-    })
+
+    # Renderiza la página del juego en lugar de devolver directamente los datos de la canción
+    return render_template("game.html", mode=mode)
 
 @app.route("/guess", methods=["POST"])
 def guess():

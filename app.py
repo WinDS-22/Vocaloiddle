@@ -72,7 +72,8 @@ def add_ip_to_mongodb_atlas():
 
 # Fetch all songs from MongoDB
 def fetch_all_songs():
-    return list(songs_collection.find({}, {"_id": 0, "Artist": 1, "defaultName": 1, "name": 1, "links": 1}))
+    # Asegúrate de incluir el campo "_id" en la proyección
+    return list(songs_collection.find({}, {"_id": 1, "Artist": 1, "defaultName": 1, "name": 1, "links": 1, "snippetUrl": 1, "thumbUrl": 1}))
 
 # Select the daily song
 def daily_mode():
@@ -222,12 +223,12 @@ def get_song_data(mode):
         song = random.choice(all_songs)
 
     return jsonify({
-        "_id": str(song["_id"]),  # Convertimos el ObjectId a string
+        "_id": str(song["_id"]),  # Asegúrate de que el _id esté presente
         "title": song["defaultName"],
         "artist": song["Artist"],
         "name": song["name"],
         "links": song["links"],
-        "snippetUrl": song.get("snippetUrl", ""),  # Aquí es donde necesitas verificar que existan los URLs
+        "snippetUrl": song.get("snippetUrl", ""),
         "thumbUrl": song.get("thumbUrl", "")
     })
 
